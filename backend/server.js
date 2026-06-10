@@ -19,21 +19,19 @@ io.on('connection', socket => {
     socket.on('join-room', (roomId) => {
         socket.join(roomId);
         console.log(`User ${socket.id} joined room ${roomId}`);
-        // Inform other users in the room
         socket.to(roomId).emit('user-joined', socket.id);
     });
 
-    socket.on('sending-signal', payload => {
-        io.to(payload.userToSignal).emit('user-joined-signal', { signal: payload.signal, callerID: payload.callerID });
-    });
-
-    socket.on('returning-signal', payload => {
-        io.to(payload.callerID).emit('receiving-returned-signal', { signal: payload.signal, id: socket.id });
+    socket.on('send-message', (payload) => {
+        // Relay text to others in the room
+        socket.to(payload.roomId).emit('receive-message', {
+            id: Math.random().toString(),
+            text: payload.text
+        });
     });
 
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
-        socket.broadcast.emit('user-disconnected', socket.id);
     });
 });
 
