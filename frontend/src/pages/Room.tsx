@@ -21,10 +21,18 @@ export default function Room() {
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        // Join room on mount
-        socket.emit('join-room', roomID);
+        // Función para unirse a la sala
+        const joinRoom = () => {
+            socket.emit('join-room', roomID);
+        };
 
-        // Listen for incoming messages
+        // Unirse si ya está conectado, o unirse cada vez que se reconecte
+        if (socket.connected) {
+            joinRoom();
+        }
+        socket.on('connect', joinRoom);
+
+        // Escuchar mensajes entrantes
         const handleReceiveMessage = (payload: { id: string, text: string }) => {
             setMessages(prev => [...prev, { id: payload.id, sender: 'other', text: payload.text }]);
             
@@ -39,8 +47,8 @@ export default function Room() {
         socket.on('receive-message', handleReceiveMessage);
 
         return () => {
+            socket.off('connect', joinRoom);
             socket.off('receive-message', handleReceiveMessage);
-            // Optionally could leave room, but disconnect handles it
         };
     }, [roomID]);
 
