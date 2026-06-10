@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
-import { Send, Copy, Check, Trash2, ShieldCheck } from 'lucide-react';
+import { Send, Copy, Check, Trash2, ShieldCheck, X } from 'lucide-react';
+
 const socketUrl = import.meta.env.PROD ? 'https://chatprivado-6.onrender.com' : 'http://localhost:5000';
 const socket = io(socketUrl);
 
@@ -13,6 +14,7 @@ interface ChatMessage {
 
 export default function Room() {
     const { roomID } = useParams<{ roomID: string }>();
+    const navigate = useNavigate();
     
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -25,6 +27,13 @@ export default function Room() {
         // Listen for incoming messages
         const handleReceiveMessage = (payload: { id: string, text: string }) => {
             setMessages(prev => [...prev, { id: payload.id, sender: 'other', text: payload.text }]);
+            
+            // Notificación camuflada en la pestaña del navegador
+            const originalTitle = document.title;
+            document.title = "⚠️ SysAdmin Alert";
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 3000);
         };
 
         socket.on('receive-message', handleReceiveMessage);
@@ -78,6 +87,9 @@ export default function Room() {
                         </button>
                         <button className="icon-btn" onClick={clearChat} title="Vaciar chat">
                             <Trash2 size={18} />
+                        </button>
+                        <button className="icon-btn" onClick={() => navigate('/')} title="Volver al panel">
+                            <X size={18} />
                         </button>
                     </div>
                 </div>
