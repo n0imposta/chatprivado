@@ -4,7 +4,10 @@ import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, Send } from 'lucide-react';
 
-const socket = io('http://localhost:5000'); // Adjust to your backend URL
+const socketUrl = import.meta.env.PROD ? window.location.origin : 'http://localhost:5000';
+const socket = io(socketUrl, {
+    path: '/_/backend/socket.io'
+});
 
 interface ChatMessage {
     id: string;

@@ -7,6 +7,7 @@ app.use(cors());
 
 const server = http.createServer(app);
 const io = require('socket.io')(server, {
+    path: '/_/backend/socket.io',
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
