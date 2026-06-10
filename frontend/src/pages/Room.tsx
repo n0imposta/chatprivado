@@ -4,10 +4,9 @@ import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, Send } from 'lucide-react';
 
-const socketUrl = import.meta.env.PROD ? window.location.origin : 'http://localhost:5000';
-const socket = io(socketUrl, {
-    path: '/_/backend/socket.io'
-});
+// Use Render URL for production WebSockets
+const socketUrl = import.meta.env.PROD ? 'https://chatprivado-3.onrender.com' : 'http://localhost:5000';
+const socket = io(socketUrl);
 
 interface ChatMessage {
     id: string;
