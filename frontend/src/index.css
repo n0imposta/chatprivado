@@ -346,11 +346,6 @@ body {
   margin-top: 2rem;
   font-size: 0.9rem;
 }
-  background: var(--panel-bg);
-  border-left: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-}
 
 .chat-header {
   padding: 1rem;

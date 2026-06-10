@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import { Send, Copy, Check, Trash2, ShieldCheck } from 'lucide-react';
-
-// Use Render URL for production WebSockets
 const socketUrl = import.meta.env.PROD ? 'https://chatprivado-6.onrender.com' : 'http://localhost:5000';
 const socket = io(socketUrl);
 
@@ -15,7 +13,6 @@ interface ChatMessage {
 
 export default function Room() {
     const { roomID } = useParams<{ roomID: string }>();
-    const navigate = useNavigate();
     
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
