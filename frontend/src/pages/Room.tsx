@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Send } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Send, Copy, Check, Trash2 } from 'lucide-react';
 
 // Use Render URL for production WebSockets
 const socketUrl = import.meta.env.PROD ? 'https://chatprivado-6.onrender.com' : 'http://localhost:5000';
@@ -20,6 +20,7 @@ export default function Room() {
     
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [newMessage, setNewMessage] = useState('');
+    const [copied, setCopied] = useState(false);
     
     const [audioEnabled, setAudioEnabled] = useState(true);
     const [videoEnabled, setVideoEnabled] = useState(true);
@@ -65,12 +66,11 @@ export default function Room() {
                 if (peerVideo.current) {
                     peerVideo.current.srcObject = null;
                 }
-                // Handle peer removal from refs if needed
             });
 
         }).catch(err => {
              console.error("Error accessing media devices", err);
-             alert("Error accessing camera/microphone. Please allow permissions.");
+             alert("Error de cámara/micrófono. Revisa los permisos.");
         });
         
         return () => {
@@ -159,21 +159,43 @@ export default function Room() {
         navigate('/');
     };
 
-    const sendMessage = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newMessage.trim()) return;
+    const sendMsg = (text: string) => {
+        if (!text.trim()) return;
 
         peersRef.current.forEach(p => {
-            p.peer.send(newMessage);
+            p.peer.send(text);
         });
 
-        setMessages(prev => [...prev, { id: Math.random().toString(), sender: 'me', text: newMessage }]);
+        setMessages(prev => [...prev, { id: Math.random().toString(), sender: 'me', text }]);
+    };
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        sendMsg(newMessage);
         setNewMessage('');
+    };
+
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const clearChat = () => {
+        setMessages([]);
     };
 
     return (
         <div className="room-container">
             <div className="video-section">
+                <div className="room-header">
+                    <span style={{color: '#94a3b8', fontSize: '0.9rem'}}>Session: {roomID}</span>
+                    <button className={`share-btn ${copied ? 'copied' : ''}`} onClick={copyLink}>
+                        {copied ? <Check size={16} /> : <Copy size={16} />}
+                        {copied ? 'Enlace Copiado' : 'Copiar Enlace'}
+                    </button>
+                </div>
+
                 <div className="videos-grid">
                     <div className="video-wrapper">
                         <video ref={userVideo} autoPlay muted playsInline />
@@ -200,7 +222,10 @@ export default function Room() {
             
             <div className="chat-section">
                 <div className="chat-header">
-                    Chat Seguro
+                    <span>Chat Seguro</span>
+                    <button className="icon-btn" onClick={clearChat} title="Vaciar chat">
+                        <Trash2 size={18} />
+                    </button>
                 </div>
                 <div className="chat-messages">
                     {messages.map(msg => (
@@ -209,10 +234,17 @@ export default function Room() {
                         </div>
                     ))}
                 </div>
-                <form className="chat-input" onSubmit={sendMessage}>
+                
+                <div className="quick-actions">
+                    <button className="quick-btn" onClick={() => sendMsg("No puedo hablar")}>No puedo hablar</button>
+                    <button className="quick-btn" onClick={() => sendMsg("Sí puedo hablar")}>Sí puedo hablar</button>
+                    <button className="quick-btn" onClick={() => sendMsg("Escribe en 10 minutos")}>Escribe en 10 minutos</button>
+                </div>
+
+                <form className="chat-input" onSubmit={handleFormSubmit}>
                     <input 
                         type="text" 
-                        placeholder="Escribe un mensaje..." 
+                        placeholder="Mensaje..." 
                         value={newMessage}
                         onChange={e => setNewMessage(e.target.value)}
                     />
