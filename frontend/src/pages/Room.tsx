@@ -5,7 +5,7 @@ import Peer from 'simple-peer';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, Send } from 'lucide-react';
 
 // Use Render URL for production WebSockets
-const socketUrl = import.meta.env.PROD ? 'https://chatprivado-3.onrender.com' : 'http://localhost:5000';
+const socketUrl = import.meta.env.PROD ? 'https://chatprivado-6.onrender.com' : 'http://localhost:5000';
 const socket = io(socketUrl);
 
 interface ChatMessage {
