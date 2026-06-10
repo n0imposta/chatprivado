@@ -81,11 +81,20 @@ export default function Room() {
         };
     }, [roomID]);
 
+    const iceServersConfig = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:global.stun.twilio.com:3478' }
+        ]
+    };
+
     function createPeer(userToSignal: string, callerID: string, stream: MediaStream) {
         const peer = new Peer({
             initiator: true,
             trickle: false,
             stream,
+            config: iceServersConfig
         });
 
         peer.on('signal', signal => {
@@ -111,6 +120,7 @@ export default function Room() {
             initiator: false,
             trickle: false,
             stream,
+            config: iceServersConfig
         });
 
         peer.on('signal', signal => {
